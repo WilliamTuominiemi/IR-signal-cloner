@@ -1,13 +1,18 @@
 #include <IRremote.hpp>
 #define IR_RECEIVE_PIN 7
-#define IR_SEND_PIN 3
-#define BUTTON_PIN 2
+#define IR_SEND_PIN 5
+#define TRANSMIT_BUTTON_PIN 2
+#define RECORD_BUTTON_PIN 3
+#define RECORD_INDC_LED 12
 
-int buttonState = 0;
+int transmitButtonState = 0;
+int recordButtonState = 0;
 
 void setup()
 {
-  pinMode(BUTTON_PIN, INPUT);
+  pinMode(TRANSMIT_BUTTON_PIN, INPUT);
+  pinMode(RECORD_BUTTON_PIN, INPUT);
+  pinMode(RECORD_INDC_LED, OUTPUT);
 
   Serial.begin(9600);
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
@@ -15,10 +20,17 @@ void setup()
 }
 
 void loop() {
-  buttonState = digitalRead(BUTTON_PIN);
+  transmitButtonState = digitalRead(TRANSMIT_BUTTON_PIN);
+  recordButtonState = digitalRead(RECORD_BUTTON_PIN);
 
-  if (buttonState == HIGH) {
+  if (transmitButtonState == HIGH) {
     IrSender.sendNEC(0x01, 0x02, 1); 
+  } 
+
+  if (recordButtonState == HIGH) {
+    digitalWrite(RECORD_INDC_LED, HIGH);
+  } else {
+    digitalWrite(RECORD_INDC_LED, LOW);
   }
 
   if (IrReceiver.decode()) {
