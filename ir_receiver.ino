@@ -26,7 +26,7 @@ void loop() {
   recordButtonState = digitalRead(RECORD_BUTTON_PIN);
 
   if (transmitButtonState == HIGH) {
-    Serial.println("SENDING...");
+    Serial.print("SENDING: ");
     Serial.println(captured_data.decodedRawData, HEX);
     printIRResultShort(&Serial, &captured_data);
 
@@ -40,7 +40,7 @@ void loop() {
     digitalWrite(RECORD_INDC_LED, HIGH);
 
     if (IrReceiver.decode()) {
-      Serial.println("RECEIVING...");
+      Serial.print("RECEIVING: ");
       captured_data = IrReceiver.decodedIRData;
       Serial.println(captured_data.decodedRawData, HEX);
       IrReceiver.printIRResultShort(&Serial);
