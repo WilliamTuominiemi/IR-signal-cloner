@@ -8,6 +8,8 @@
 int transmitButtonState = 0;
 int recordButtonState = 0;
 
+IRData captured_data;
+
 void setup()
 {
   pinMode(TRANSMIT_BUTTON_PIN, INPUT);
@@ -24,19 +26,28 @@ void loop() {
   recordButtonState = digitalRead(RECORD_BUTTON_PIN);
 
   if (transmitButtonState == HIGH) {
-    IrSender.sendNEC(0x01, 0x02, 1); 
+    Serial.println("SENDING...");
+    Serial.println(captured_data.decodedRawData, HEX);
+    printIRResultShort(&Serial, &captured_data);
+
+    IrSender.write(captured_data.protocol,
+      captured_data.address,
+      captured_data.command,
+      0);
   } 
 
   if (recordButtonState == HIGH) {
     digitalWrite(RECORD_INDC_LED, HIGH);
-  } else {
-    digitalWrite(RECORD_INDC_LED, LOW);
-  }
 
-  if (IrReceiver.decode()) {
-      Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    if (IrReceiver.decode()) {
+      Serial.println("RECEIVING...");
+      captured_data = IrReceiver.decodedIRData;
+      Serial.println(captured_data.decodedRawData, HEX);
       IrReceiver.printIRResultShort(&Serial);
       IrReceiver.printIRSendUsage(&Serial);
       IrReceiver.resume();
+    }
+  } else {
+    digitalWrite(RECORD_INDC_LED, LOW);
   }
 }
